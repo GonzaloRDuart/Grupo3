@@ -1,1 +1,1 @@
-# Sector para realizar tareas de logico
+# Repo para realizar tareas de logico
