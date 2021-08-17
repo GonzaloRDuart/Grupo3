@@ -68,7 +68,14 @@ correlativas(sistemasDeGestion,cursadas(administracionDeRecursos,investigacionOp
 correlativas(proyectoFinal,cursadas(legislacion,administracionDeRecursos,redesDeInformacion,ingenieriaDeSoftware)).
 
 esPesada(Materia):-
-    materia(Materia,Horas), Horas>4.
+    materia(Materia,Horas), 
+    not(integradora(Materia)),
+    Horas>=4.
+
+esPesada(Materia):-
+    integradora(Materia),
+    materia(Materia, Horas),
+    Horas = 6.
 
 esInicial(Materia):-
     materia(Materia,_),not(correlativas(Materia,_)).
