@@ -141,16 +141,18 @@ habilitaMaterias(Materia, Habilitadas):-
 
 curso(vero, Materia, 8):-
     esInicial(Materia).
-final(vero, ingles2, 10).
-
 curso(alan, sistemasYOrganizaciones, 6).
 curso(alan, analisisMatematico1, 6).
 curso(alan, analisisDeSistemas, 2).
 curso(alan, analisisDeSistemas, 9).
 curso(alan, fisica1, 2).
+curso(naruto, sistemasYOrganizaciones, 6).
+curso(naruto, quimica, 2).
+curso(naruto, quimica, 6).
+curso(naruto, fisica1, 8).
 final(alan, sistemasYOrganizaciones, 4).
 final(alan, ingles1, 2).
-
+final(vero, ingles2, 10).
 
 cursada(Alumno, Materia):-
     curso(Alumno, Materia, Nota),
@@ -166,3 +168,29 @@ aprobada(Alumno, Materia):-
     final(Alumno, Materia, Nota),
     Nota >= 6.
 
+modalidad(vero, Materia, modo(cuatrimestral, 2015)):-
+    esInicial(Materia).
+modalidad(naruto, sistemasYOrganizaciones, modo(anual, 2015)).
+modalidad(naruto, quimica, modo(cuatrimestral, 2015, 1)).
+modalidad(naruto, quimica, modo(cuatrimestral, 2015, 2)).
+modalidad(naruto, fisica1, modo(verano, 2016)).
+
+/* Despues agregar las modalidades de Alan y pulir las de Vero. por el momento puse que curso todas cuatrimestrales el mismo anio*/
+
+anioDeCursada(Alumno, Materia, Anio):-
+    curso(Alumno, Materia, _),
+    modalidad(Alumno, Materia, modo(anual, Anio)).
+anioDeCursada(Alumno, Materia, Anio):-
+    curso(Alumno, Materia, _),
+    modalidad(Alumno, Materia, modo(cuatrimestral, Anio, _)).
+anioDeCursada(Alumno, Materia, Anio):-
+    curso(Alumno, Materia, _),
+    modalidad(Alumno, Materia, modo(verano, AnioCalendario)),
+    Anio is AnioCalendario - 1.
+
+/* La consola no maneja bien el caso de quimica. Y tira error luego de indicar el año de SyO. Arreglar */
+
+recurso(Alumno, Materia):-
+    modalidad(Alumno, Materia, X),
+    modalidad(Alumno, Materia, Y),
+    X \= Y.
