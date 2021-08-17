@@ -194,3 +194,17 @@ recurso(Alumno, Materia):-
     modalidad(Alumno, Materia, X),
     modalidad(Alumno, Materia, Y),
     X \= Y.
+
+invictus(Estudiante):-
+    not(recurso(Estudiante, _)).
+
+/* no es inversible */
+
+promociona(Estudiante, Materia):-
+    curso(Estudiante, Materia, Nota),
+    Nota >= 8.
+
+buenasCursadas(Estudiante):-
+    forall(curso(Estudiante, Materia, _), promociona(Estudiante, Materia)).
+
+/* tampoco es inversible */
