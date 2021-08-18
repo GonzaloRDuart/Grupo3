@@ -165,3 +165,30 @@ reCurso(Alumno, Materia):-
     cursada(Alumno, Materia, Fecha1),
     cursada(Alumno, Materia, Fecha2),
     Fecha1 \= Fecha2.
+    
+/* perfiles de estudiantes*/
+
+sinDescanso(Alumno, Materia):-
+    cursada(Alumno, Materia, cuatrimestral(Anio, primer)),
+    cursada(Alumno, Materia, cuatrimestral(Anio, segundo)).
+
+sinDescanso(Alumno, Materia):-
+    cursada(Alumno, Materia, cuatrimestral(Anio1, segundo)),
+    cursada(Alumno, Materia, anual(Anio2)),
+    Anio2 is Anio1 + 1.
+
+sinDescanso(Alumno, Materia):-
+    cursada(Alumno, Materia, cuatrimestral(Anio1, segundo)),
+    cursada(Alumno, Materia, cuatrimestral(Anio2, primer)),
+    Anio2 is Anio1 + 1.
+
+
+
+invictus(Alumno):-  
+    not(reCurso(Alumno, _)).
+
+repechaje(Alumno):-
+    not(aprobo(Alumno, Materia)).
+
+buenasCursadas(Alumno):-
+    forall(cursada(Alumno, Materia, _), aprobo(Alumno, Materia)).
