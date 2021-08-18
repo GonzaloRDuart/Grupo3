@@ -37,14 +37,68 @@ materia(sistemasDeGestion,4).
 estudiante(vero).
 estudiante(alan).
 estudiante(lucio).
+estudiante(milton). 
+
 integradora(sistemasYOrganizaciones).
 integradora(analisisDeSistemas).
 integradora(disenioDeSistemas).
 integradora(administracionDeRecursos).
 integradora(proyectoFinal).
 
+correlativa(analisisDeSistemas, sistemasYOrganizaciones).
+correlativa(analisisDeSistemas, algoritmos).
+correlativa(analisisMatematicoII, analisisMatematicoI).
+correlativa(analisisMatematicoII, algebra).
+correlativa(sintaxis, matematicaDiscreta).
+correlativa(sintaxis, algoritmos).
+correlativa(pdep, matematicaDiscreta).
+correlativa(pdep, algoritmos).
+correlativa(proba, analisisMatematicoI).
+correlativa(proba, algebra).
+correlativa(disenioDeSistemas, analisisDeSistemas).
+correlativa(disenioDeSistemas, pdep).
+correlativa(sistemasOperativos, matematicaDiscreta).
+correlativa(sistemasOperativos, algoritmos).
+correlativa(sistemasOperativos, arquitectura).
+correlativa(fisicaII, analisisMatematicoI).
+correlativa(fisicaII, fisicaI).
+correlativa(economia, analisisDeSistemas).
+correlativa(gestionDeDatos, analisisDeSistemas).
+correlativa(gestionDeDatos, pdep).
+correlativa(gestionDeDatos, sintaxis).
+correlativa(inglesII, inglesI).
+correlativa(matematicaSuperior, analisisMatematicoII).
+correlativa(legislacion, analisisDeSistemas).
+correlativa(legislacion, ingenieriaYSociedad).
+correlativa(administracionDeRecursos, disenioDeSistemas).
+correlativa(administracionDeRecursos, sistemasOperativos).
+correlativa(ingenieriaDeSoftware, proba).
+correlativa(ingenieriaDeSoftware, disenioDeSistemas).
+correlativa(ingenieriaDeSoftware, gestionDeDatos).
+correlativa(teoriaDeControl, quimica).
+correlativa(teoriaDeControl, matematicaSuperior).
+correlativa(comunicaciones, arquitectura).
+correlativa(comunicaciones, analisisMatematicoII).
+correlativa(comunicaciones, fisicaII).
+correlativa(redesDeInformacion, sistemasOperativos).
+correlativa(redesDeInformacion, comunicaciones).
+correlativa(investigacionOperativa, proba).
+correlativa(investigacionOperativa, matematicaSuperior).
+correlativa(simulacion, proba).
+correlativa(simulacion, matematicaSuperior).
+correlativa(inteligenciaArtificial, simulacion).
+correlativa(inteligenciaArtificial, investigacionOperativa).
+correlativa(administracionGerencial, administracionDeRecursos).
+correlativa(administracionGerencial, investigacionOperativa).
+correlativa(sistemasDeGestion, administracionDeRecursos).
+correlativa(sistemasDeGestion, investigacionOperativa).
+correlativa(sistemasDeGestion, simulacion).
+correlativa(proyectoFinal, legislacion).
+correlativa(proyectoFinal, administracionDeRecursos).
+correlativa(proyectoFinal, redesDeInformacion).
+correlativa(proyectoFinal, ingenieriaDeSoftware).
 
-correlativas(analisisDeSistemas,cursadas(sistemasYOrganizaciones,algoritmos)).
+/* correlativas(analisisDeSistemas,cursadas(sistemasYOrganizaciones,algoritmos)).
 correlativas(analisisMatematicoII,cursadas(analisisMatematicoI,algebra)).
 correlativas(sintaxis,cursadas(matematicaDiscreta,algoritmos)).
 correlativas(pdep,cursadas(matematicaDiscreta,algoritmos)).
@@ -68,19 +122,20 @@ correlativas(inteligenciaArtificial,cursadas(investigacionOperativa,simulacion))
 correlativas(administracionGerencial,cursadas(administracionDeRecursos,investigacionOperativa)).
 correlativas(sistemasDeGestion,cursadas(administracionDeRecursos,investigacionOperativa,simulacion)).
 correlativas(proyectoFinal,cursadas(legislacion,administracionDeRecursos,redesDeInformacion,ingenieriaDeSoftware)).
-
+ */
 esPesada(Materia):-
     materia(Materia,Horas), Horas>4.
+
 esPesada(Materia):-
     integradora(Materia),
     materia(Materia,Horas), 
     Horas>6.
 
 esInicial(Materia):-
-    materia(Materia,_),not(correlativas(Materia,_)).
+    materia(Materia,_),not(correlativa(Materia,_)).
 
 paraCursar(Materia,Correlativas):-
-    materia(Materia,_),correlativas(Materia,cursadas(Correlativas)).
+    materia(Materia,_),correlativa(Materia,cursadas(Correlativas)).
 
 /* paraCursar(Materia):-
     materia(Materia,_),correlativas(Materia,cursadas3(Materia1,Materia2,Materia3,Materia4)),correlativas(Materia1),correlativas(Materia2).
@@ -104,57 +159,61 @@ final(alan,sistemasYOrganizaciones,4).
 final(alan,inglesI,2).
 
 cursada(Alguien,Materia):-
-    curso(Alguien,Materia,Nota,_),Nota>=6.
+    curso(Alguien,Materia,Nota,_,_),Nota>=6.
 
-curso(vero,Materia,8,modalidad(2018,anual)):-
+curso(vero,Materia,8,2018,anual):-
     esInicial(Materia).
 
-curso(alan,sistemasYOrganizaciones,6,modalidad(2018,anual)).
-curso(alan,analisisMatematicoI,6,modalidad(2018,anual)).
-curso(alan,analisisDeSistemas,2,modalidad(2019,anual)). %no las curso, porque no aprobo la cursada, tengo que ver que hago con esta y fisica 1
-curso(alan,analisisDeSistemas,9,modalidad(2020,anual)).
-curso(alan,fisicaI,2,modalidad(2018,anual)).
-curso(mateo,sistemasYOrganizaciones,6,modalidad(2015,anual)).
-curso(mateo,quimica,3,modalidad(2015,primerCuatrimestre)).
-curso(mateo,quimica,6,modalidad(2015,segundoCuatrimestre)).
-curso(mateo,fisicaI,6,modalidad(2015,cursoDeVerano)).
-curso(julian,quimica,2,modalidad(2016,anual)).
-curso(julian,quimica,3,modalidad(2017,primerCuatrimestre)).
-curso(julian,quimica,4,modalidad(2017,segundoCuatrimestre)).
-curso(julian,quimica,5,modalidad(2018,primerCuatrimestre)).
-curso(julian,fisicaI,2,modalidad(2018,cursoDeVerano)).
-curso(julian,fisicaI,2,modalidad(2018,anual)).
-curso(lucio,quimica,2,modalidad(2016,anual)).
-curso(lucio,quimica,3,modalidad(2017,segundoCuatrimestre)).
-curso(lucio,fisicaI,2,modalidad(2017,anual)).
-curso(lucio,fisicaI,10,modalidad(2018,primerCuatrimestre)).
-curso(milton,analisisMatematicoI,8,modalidad(2017,cursoDeVerano)).
-curso(milton,analisisMatematicoII,9,modalidad(2018,cursoDeVerano)).
+curso(alan,sistemasYOrganizaciones,6,2018,anual).
+curso(alan,analisisMatematicoI,6,2018,anual).
+curso(alan,analisisDeSistemas,2,2019,anual). %no las curso, porque no aprobo la cursada, tengo que ver que hago con esta y fisica 1
+curso(alan,analisisDeSistemas,9,2020,anual).
+curso(alan,fisicaI,2,2018,anual).
+curso(mateo,sistemasYOrganizaciones,6,2015,anual).
+curso(mateo,quimica,3,2015,primerCuatrimestre).
+curso(mateo,quimica,6,2015,segundoCuatrimestre).
+curso(mateo,fisicaI,6,2015,cursoDeVerano).
+curso(julian,quimica,2,2016,anual).
+curso(julian,quimica,3,2017,primerCuatrimestre).
+curso(julian,quimica,4,2017,segundoCuatrimestre).
+curso(julian,quimica,5,2018,primerCuatrimestre).
+curso(julian,fisicaI,2,2018,cursoDeVerano).
+curso(julian,fisicaI,2,2018,anual).
+curso(lucio,quimica,2,2016,anual).
+curso(lucio,quimica,3,2017,segundoCuatrimestre).
+curso(lucio,fisicaI,2,2017,anual).
+curso(lucio,fisicaI,10,2018,primerCuatrimestre).
+curso(milton,fisicaI,7,2017,primerCuatrimestre).
+curso(milton,analisisMatematicoI,8,2017,cursoDeVerano).
+curso(milton,analisisMatematicoII,9,2018,cursoDeVerano).
+
 promociono(Alguien,Materia):-
-    curso(Alguien,Materia,Nota,_), Nota > 7.
+    curso(Alguien,Materia,Nota,_,_), Nota > 7.
 
 recurso(Estudiante,Materia):-
-    materia(Materia,_),curso(Estudiante,Materia,_,modalidad(UnAnio,_)) ,curso(Estudiante,Materia,_,modalidad(OtroAnio,_)), UnAnio \= OtroAnio.
+    materia(Materia,_),curso(Estudiante,Materia,_,UnAnio,_) ,curso(Estudiante,Materia,_,OtroAnio,_), UnAnio \= OtroAnio.
 
 recurso(Estudiante,Materia):-
-    materia(Materia,_),curso(Estudiante,Materia,_,modalidad(Anio,Modalidad)) ,curso(Estudiante,Materia,_,modalidad(Anio,OtraModalidad)), Modalidad \= OtraModalidad. 
+    materia(Materia,_),curso(Estudiante,Materia,_,Anio,Modalidad) ,curso(Estudiante,Materia,_,Anio,OtraModalidad), Modalidad \= OtraModalidad. 
 
 %Perfiles
 
 sinDescanso(Estudiante):-
-    recurso(Estudiante,_),
-    forall((curso(Estudiante,Materia,_,modalidad(Anio,UnaModalidad)),(curso(Estudiante,Materia,_,modalidad(UnAnio,OtraModalidad)))),(Anio==UnAnio,OtraModalidad\=UnaModalidad)). 
+    estudiante(Estudiante),
+ /*    recurso(Estudiante,_), */
+    forall((curso(Estudiante,Materia,_,Anio,UnaModalidad),curso(Estudiante,Materia,_,UnAnio,OtraModalidad)),(Anio==UnAnio,OtraModalidad\=UnaModalidad)). 
 
 invictus(Estudiante):-
+    estudiante(Estudiante),
     not(recurso(Estudiante,_)).
 
 repechaje(Estudiante):-
-    curso(Estudiante,Materia,Nota,modalidad(Anio,anual)),curso(Estudiante,Materia,_,modalidad(OtroAnio,primerCuatrimestre)),promociono(Estudiante,Materia),Nota<6,OtroAnio is Anio+1.
+    curso(Estudiante,Materia,Nota,Anio,anual),curso(Estudiante,Materia,_,OtroAnio,primerCuatrimestre),promociono(Estudiante,Materia),Nota<6,OtroAnio is Anio+1.
 
 buenasCursadas(Estudiante):-%como la hago inversible
     estudiante(Estudiante),
-    forall(curso(Estudiante,Materia,_,_),promociono(Estudiante,Materia)).
+    forall(curso(Estudiante,Materia,_,_,_),promociono(Estudiante,Materia)).
 
 veraniego(Estudiante):-
     estudiante(Estudiante),
-    forall(curso(Estudiante,_,_,modalidad(Anio,_),curso(Estudiante,_,_,modalidad(Anio,cursoDeVerano)))).
+    forall(curso(Estudiante,_,_,Anio,_),curso(Estudiante,_,_,Anio,cursoDeVerano)). 
