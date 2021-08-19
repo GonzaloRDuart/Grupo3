@@ -149,6 +149,10 @@ curso(naruto, quimica, 6, modo(cuatrimestral, 2020, 2)).
 curso(naruto, fisica1, 8, modo(anual, 2019)).
 curso(naruto, matematicaDiscreta, 5, modo(anual, 2019)).
 curso(naruto, matematicaDiscreta, 8, modo(cuatrimestral, 2020, 1)).
+curso(veraniego, matematicaDiscreta, 5, modo(anual, 2017)).
+curso(veraniego, matematicaDiscreta, 8, modo(verano, 2018)).
+curso(veraniego, analisisDeSistemas, 8, modo(verano, 2019)).
+curso(veraniego, sistemasYOrganizaciones, 8, modo(verano, 2020)).
 final(alan, sistemasYOrganizaciones, 4).
 final(alan, ingles1, 2).
 final(vero, ingles2, 10).
@@ -233,4 +237,21 @@ sinDescanso(Estudiante):-
     recurso(Estudiante, Materia).
 
 /* al tratar de aplicarla de forma inversible devuelve los alumnos correctamente pero en muchas repeticiones*/
+
+primerAnioDeCursada(Estudiante, PrimerAnio):-
+    anioDeCursada(Estudiante, _, PrimerAnio),
+    forall(anioDeCursada(Estudiante, _, Anio), PrimerAnio =< Anio).
+
+ultimoAnioDeCursada(Estudiante, UltimoAnio):-
+    anioDeCursada(Estudiante, _, UltimoAnio),
+    forall(anioDeCursada(Estudiante, _, Anio), UltimoAnio >= Anio).
+
+cursaEseVerano(Estudiante, Anio):-
+    curso(Estudiante, _, _, modo(verano, AnioCalendario)),
+    Anio is AnioCalendario - 1.
+
+seLoQueHicisteElVeranoPasado(Estudiante):-
+    primerAnioDeCursada(Estudiante, PrimerAnio),
+    ultimoAnioDeCursada(Estudiante, UltimoAnio),
+    forall(between(PrimerAnio, UltimoAnio, Anio), cursaEseVerano(Estudiante, Anio)).
 
