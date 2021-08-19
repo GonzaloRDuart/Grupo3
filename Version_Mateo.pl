@@ -132,10 +132,12 @@ esPesada(Materia):-
     Horas>6.
 
 esInicial(Materia):-
-    materia(Materia,_),not(correlativa(Materia,_)).
+    materia(Materia,_),
+    not(correlativa(Materia,_)).
 
 paraCursar(Materia,Correlativas):-
-    materia(Materia,_),correlativa(Materia,cursadas(Correlativas)).
+    materia(Materia,_),
+    correlativa(Materia,cursadas(Correlativas)).
 
 /* paraCursar(Materia):-
     materia(Materia,_),correlativas(Materia,cursadas3(Materia1,Materia2,Materia3,Materia4)),correlativas(Materia1),correlativas(Materia2).
@@ -148,18 +150,21 @@ paraCursar(Materia):-
 
 %Los alumnos
 
-aprobo(Alguien,Materia):-
-    promociono(Alguien,Materia).
-
-aprobo(Alguien,Materia):-
-  not(promociono(Alguien,Materia)),final(Alguien,Materia,Nota),Nota>6. %el not promociono creo que se puede sacar
-
 final(vero,inglesII,10).
 final(alan,sistemasYOrganizaciones,4).
 final(alan,inglesI,2).
 
+aprobo(Alguien,Materia):-
+    promociono(Alguien,Materia).
+
+aprobo(Alguien,Materia):-
+  not(promociono(Alguien,Materia)),
+  final(Alguien,Materia,Nota),Nota>6. %el not promociono creo que se puede sacar
+
+
 cursada(Alguien,Materia):-
-    curso(Alguien,Materia,Nota,_,_),Nota>=6.
+    curso(Alguien,Materia,Nota,_,_),
+    Nota>=6.
 
 curso(vero,Materia,8,2018,anual):-
     esInicial(Materia).
@@ -188,32 +193,59 @@ curso(milton,analisisMatematicoI,8,2017,cursoDeVerano).
 curso(milton,analisisMatematicoII,9,2018,cursoDeVerano).
 
 promociono(Alguien,Materia):-
-    curso(Alguien,Materia,Nota,_,_), Nota > 7.
+    curso(Alguien,Materia,Nota,_,_), 
+    Nota > 7.
+
+cuandoCurso(Estudiante,Materia,Anio):-
+    curso(Estudiante,Materia,_,Anio,_).
+
+cuandoCurso(Estudiante,Materia,Anio):-
+    curso(Estudiante,Materia,_,Anio,cursoDeVerano), Anio is Anio-1.
 
 recurso(Estudiante,Materia):-
-    materia(Materia,_),curso(Estudiante,Materia,_,UnAnio,_) ,curso(Estudiante,Materia,_,OtroAnio,_), UnAnio \= OtroAnio.
+    materia(Materia,_),
+    curso(Estudiante,Materia,_,UnAnio,_) ,
+    curso(Estudiante,Materia,_,OtroAnio,_), 
+    UnAnio \= OtroAnio.
 
 recurso(Estudiante,Materia):-
-    materia(Materia,_),curso(Estudiante,Materia,_,Anio,Modalidad) ,curso(Estudiante,Materia,_,Anio,OtraModalidad), Modalidad \= OtraModalidad. 
+    materia(Materia,_),
+    curso(Estudiante,Materia,_,Anio,Modalidad),
+    curso(Estudiante,Materia,_,Anio,OtraModalidad), 
+    Modalidad \= OtraModalidad. 
 
+    recurso(Estudiante,Materia):-
+        materia(Materia,_),
+        curso(Estudiante,Materia,_,Anio,Modalidad) ,
+        curso(Estudiante,Materia,_,Anio,OtraModalidad), 
+        Modalidad \= OtraModalidad. 
 %Perfiles
 
 sinDescanso(Estudiante):-
     estudiante(Estudiante),
  /*    recurso(Estudiante,_), */
-    forall((curso(Estudiante,Materia,_,Anio,UnaModalidad),curso(Estudiante,Materia,_,UnAnio,OtraModalidad)),(Anio==UnAnio,OtraModalidad\=UnaModalidad)). 
+    forall(
+        (curso(Estudiante,Materia,_,Anio,UnaModalidad),
+        curso(Estudiante,Materia,_,UnAnio,OtraModalidad)),
+        (UnAnio == Anio ,OtraModalidad\=UnaModalidad)). 
 
 invictus(Estudiante):-
     estudiante(Estudiante),
     not(recurso(Estudiante,_)).
 
 repechaje(Estudiante):-
-    curso(Estudiante,Materia,Nota,Anio,anual),curso(Estudiante,Materia,_,OtroAnio,primerCuatrimestre),promociono(Estudiante,Materia),Nota<6,OtroAnio is Anio+1.
+    curso(Estudiante,Materia,Nota,Anio,anual),
+    curso(Estudiante,Materia,_,OtroAnio,primerCuatrimestre),
+    promociono(Estudiante,Materia),
+    Nota<6,OtroAnio is Anio+1.
 
 buenasCursadas(Estudiante):-%como la hago inversible
     estudiante(Estudiante),
-    forall(curso(Estudiante,Materia,_,_,_),promociono(Estudiante,Materia)).
+    forall(curso(Estudiante,Materia,_,_,_),
+    promociono(Estudiante,Materia)).
 
 veraniego(Estudiante):-
     estudiante(Estudiante),
-    forall(curso(Estudiante,_,_,Anio,_),curso(Estudiante,_,_,Anio,cursoDeVerano)). 
+    forall(
+    curso(Estudiante,_,_,Anio,_),
+    curso(Estudiante,_,_,Anio,cursoDeVerano)). 
