@@ -1,4 +1,3 @@
-
 materia(analisisMatematico1, 5, no).
 materia(algebraYGeometriaAnalitica, 5, no).
 materia(matematicaDiscreta, 3, no).
@@ -117,7 +116,6 @@ tambienNecesito(Materia, SubMateria):-
 
 /* Definicion recursiva, funciona pero puede devolver varias veces lo mismo si hay 2 materias necesarias que a su vez comparten materias necesarias.
 Considerar utilizar multiples niveles de tambienNecesito en vez de recursividad.
-
 Ej:
 tambienNecesito(Materia, Submateria):-
     esNecesaria(Materia, Submateria).
@@ -133,66 +131,61 @@ tambienNecesito(Materia, Submateria):-
     esNecesaria(X1, X2),
     esNecesaria(X2, X3),
     esNecesaria(X3, Submateria).
-
 Verificar si haría falta otro nivel. */
 
 habilitaMaterias(Materia, Habilitadas):-
     esNecesaria(Habilitadas, Materia).
 
-curso(vero, Materia, 8):-
+curso(vero, Materia, 8, modo(anual, 2019)):-
     esInicial(Materia).
-curso(alan, sistemasYOrganizaciones, 6).
-curso(alan, analisisMatematico1, 6).
-curso(alan, analisisDeSistemas, 2).
-curso(alan, analisisDeSistemas, 9).
-curso(alan, fisica1, 2).
-curso(naruto, sistemasYOrganizaciones, 6).
-curso(naruto, quimica, 2).
-curso(naruto, quimica, 6).
-curso(naruto, fisica1, 8).
+curso(alan, sistemasYOrganizaciones, 6, modo(anual, 2020)).
+curso(alan, analisisMatematico1, 6, modo(anual, 2020)).
+curso(alan, analisisDeSistemas, 2, modo(anual, 2019)).
+curso(alan, analisisDeSistemas, 9, modo(anual, 2020)).
+curso(alan, fisica1, 2, modo(anual, 2019)).
+curso(naruto, sistemasYOrganizaciones, 6, modo(anual, 2018)).
+curso(naruto, quimica, 2, modo(cuatrimestral, 2020, 1)).
+curso(naruto, quimica, 6, modo(cuatrimestral, 2020, 2)).
+curso(naruto, fisica1, 8, modo(anual, 2019)).
+curso(naruto, matematicaDiscreta, 5, modo(anual, 2019)).
+curso(naruto, matematicaDiscreta, 8, modo(cuatrimestral, 2020, 1)).
+curso(veraniego, matematicaDiscreta, 5, modo(anual, 2017)).
+curso(veraniego, matematicaDiscreta, 8, modo(verano, 2018)).
+curso(veraniego, analisisDeSistemas, 8, modo(verano, 2019)).
+curso(veraniego, sistemasYOrganizaciones, 8, modo(verano, 2020)).
 final(alan, sistemasYOrganizaciones, 4).
 final(alan, ingles1, 2).
 final(vero, ingles2, 10).
 
 cursada(Alumno, Materia):-
-    curso(Alumno, Materia, Nota),
+    curso(Alumno, Materia, Nota, _),
     Nota >= 6.
 cursada(Alumno, Materia):-
     final(Alumno, Materia, Nota),
     Nota >= 6.
 
 aprobada(Alumno, Materia):-
-    curso(Alumno, Materia, Nota),
+    curso(Alumno, Materia, Nota, _),
     Nota > 7.
 aprobada(Alumno, Materia):-
     final(Alumno, Materia, Nota),
     Nota >= 6.
 
-modalidad(vero, Materia, modo(cuatrimestral, 2015)):-
-    esInicial(Materia).
-modalidad(naruto, sistemasYOrganizaciones, modo(anual, 2015)).
-modalidad(naruto, quimica, modo(cuatrimestral, 2015, 1)).
-modalidad(naruto, quimica, modo(cuatrimestral, 2015, 2)).
-modalidad(naruto, fisica1, modo(verano, 2016)).
-
 /* Despues agregar las modalidades de Alan y pulir las de Vero. por el momento puse que curso todas cuatrimestrales el mismo anio*/
 
 anioDeCursada(Alumno, Materia, Anio):-
-    curso(Alumno, Materia, _),
-    modalidad(Alumno, Materia, modo(anual, Anio)).
+    curso(Alumno, Materia, _, modo(anual, Anio)).
 anioDeCursada(Alumno, Materia, Anio):-
-    curso(Alumno, Materia, _),
-    modalidad(Alumno, Materia, modo(cuatrimestral, Anio, _)).
+    curso(Alumno, Materia, _, modo(cuatrimestral, Anio, _)).
 anioDeCursada(Alumno, Materia, Anio):-
-    curso(Alumno, Materia, _),
-    modalidad(Alumno, Materia, modo(verano, AnioCalendario)),
+    curso(Alumno, Materia, _, modo(verano, AnioCalendario)),
     Anio is AnioCalendario - 1.
 
 /* La consola no maneja bien el caso de quimica. Y tira error luego de indicar el año de SyO. Arreglar */
 
 recurso(Alumno, Materia):-
-    modalidad(Alumno, Materia, X),
-    modalidad(Alumno, Materia, Y),
+    curso(Alumno, Materia, _, X),
+    curso(Alumno, Materia, _, Y),
     X \= Y.
 
 invictus(Estudiante):-
@@ -201,10 +194,64 @@ invictus(Estudiante):-
 /* no es inversible */
 
 promociona(Estudiante, Materia):-
-    curso(Estudiante, Materia, Nota),
+    curso(Estudiante, Materia, Nota, _),
     Nota >= 8.
 
 buenasCursadas(Estudiante):-
-    forall(curso(Estudiante, Materia, _), promociona(Estudiante, Materia)).
+    forall(curso(Estudiante, Materia, _, _), promociona(Estudiante, Materia)).
 
 /* tampoco es inversible */
+
+repechaje(Estudiante):-
+    curso(Estudiante, Materia, Nota1, modo(anual, Anio1)),
+    Nota1 < 6,
+    curso(Estudiante, Materia, Nota2, modo(cuatrimestral, Anio2, 1)),
+    Nota1 \= Nota2,
+    Nota2 >= 8,
+    Anio2 is Anio1 + 1.
+
+recursaInmediatamente(Estudiante, Materia):-
+    curso(Estudiante, Materia, _, modo(cuatrimestral, Anio, 1)),
+    curso(Estudiante, Materia, _, modo(cuatrimestral, Anio, 2)).
+recursaInmediatamente(Estudiante, Materia):-
+    curso(Estudiante, Materia, _, modo(cuatrimestral, Anio1, 2)),
+    curso(Estudiante, Materia, _, modo(cuatrimestral, Anio2, 1)),
+    Anio2 is Anio1 + 1.
+recursaInmediatamente(Estudiante, Materia):-
+    curso(Estudiante, Materia, _, modo(cuatrimestral, Anio1, 2)),
+    curso(Estudiante, Materia, _, modo(anual, Anio2)),
+    Anio2 is Anio1 + 1.
+recursaInmediatamente(Estudiante, Materia):-
+    curso(Estudiante, Materia, _, modo(anual, Anio1)),
+    curso(Estudiante, Materia, _, modo(anual, Anio2)),
+    Anio2 is Anio1 + 1.
+recursaInmediatamente(Estudiante, Materia):-
+    curso(Estudiante, Materia, _, modo(anual, Anio1)),
+    curso(Estudiante, Materia, _, modo(cuatrimestral, Anio2, 1)),
+    Anio2 is Anio1 + 1.
+
+/* falta agregar las condiciones de cursada de verano */
+
+sinDescanso(Estudiante):-
+    forall(recurso(Estudiante, Materia), recursaInmediatamente(Estudiante, Materia)),
+    recurso(Estudiante, Materia).
+
+/* al tratar de aplicarla de forma inversible devuelve los alumnos correctamente pero en muchas repeticiones*/
+
+primerAnioDeCursada(Estudiante, PrimerAnio):-
+    anioDeCursada(Estudiante, _, PrimerAnio),
+    forall(anioDeCursada(Estudiante, _, Anio), PrimerAnio =< Anio).
+
+ultimoAnioDeCursada(Estudiante, UltimoAnio):-
+    anioDeCursada(Estudiante, _, UltimoAnio),
+    forall(anioDeCursada(Estudiante, _, Anio), UltimoAnio >= Anio).
+
+cursaEseVerano(Estudiante, Anio):-
+    curso(Estudiante, _, _, modo(verano, AnioCalendario)),
+    Anio is AnioCalendario - 1.
+
+seLoQueHicisteElVeranoPasado(Estudiante):-
+    primerAnioDeCursada(Estudiante, PrimerAnio),
+    ultimoAnioDeCursada(Estudiante, UltimoAnio),
+    forall(between(PrimerAnio, UltimoAnio, Anio), cursaEseVerano(Estudiante, Anio)).
+
