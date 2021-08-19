@@ -205,3 +205,32 @@ repechaje(Estudiante):-
     Nota1 \= Nota2,
     Nota2 >= 8,
     Anio2 is Anio1 + 1.
+
+recursaInmediatamente(Estudiante, Materia):-
+    curso(Estudiante, Materia, _, modo(cuatrimestral, Anio, 1)),
+    curso(Estudiante, Materia, _, modo(cuatrimestral, Anio, 2)).
+recursaInmediatamente(Estudiante, Materia):-
+    curso(Estudiante, Materia, _, modo(cuatrimestral, Anio1, 2)),
+    curso(Estudiante, Materia, _, modo(cuatrimestral, Anio2, 1)),
+    Anio2 is Anio1 + 1.
+recursaInmediatamente(Estudiante, Materia):-
+    curso(Estudiante, Materia, _, modo(cuatrimestral, Anio1, 2)),
+    curso(Estudiante, Materia, _, modo(anual, Anio2)),
+    Anio2 is Anio1 + 1.
+recursaInmediatamente(Estudiante, Materia):-
+    curso(Estudiante, Materia, _, modo(anual, Anio1)),
+    curso(Estudiante, Materia, _, modo(anual, Anio2)),
+    Anio2 is Anio1 + 1.
+recursaInmediatamente(Estudiante, Materia):-
+    curso(Estudiante, Materia, _, modo(anual, Anio1)),
+    curso(Estudiante, Materia, _, modo(cuatrimestral, Anio2, 1)),
+    Anio2 is Anio1 + 1.
+
+/* falta agregar las condiciones de cursada de verano */
+
+sinDescanso(Estudiante):-
+    forall(recurso(Estudiante, Materia), recursaInmediatamente(Estudiante, Materia)),
+    recurso(Estudiante, Materia).
+
+/* al tratar de aplicarla de forma inversible devuelve los alumnos correctamente pero en muchas repeticiones*/
+
