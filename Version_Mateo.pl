@@ -38,6 +38,7 @@ estudiante(vero).
 estudiante(alan).
 estudiante(lucio).
 estudiante(milton). 
+estudiante(julian).
 
 integradora(sistemasYOrganizaciones).
 integradora(analisisDeSistemas).
@@ -192,15 +193,21 @@ curso(milton,fisicaI,7,2017,primerCuatrimestre).
 curso(milton,analisisMatematicoI,8,2017,cursoDeVerano).
 curso(milton,analisisMatematicoII,9,2018,cursoDeVerano).
 
+
+
 promociono(Alguien,Materia):-
     curso(Alguien,Materia,Nota,_,_), 
     Nota > 7.
+
+
+%Modalidades 
 
 cuandoCurso(Estudiante,Materia,Anio):-
     curso(Estudiante,Materia,_,Anio,_).
 
 cuandoCurso(Estudiante,Materia,Anio):-
-    curso(Estudiante,Materia,_,Anio,cursoDeVerano), Anio is Anio-1.
+    curso(Estudiante,Materia,_,OtroAnio,cursoDeVerano), 
+    Anio is OtroAnio-1.
 
 recurso(Estudiante,Materia):-
     materia(Materia,_),
@@ -214,15 +221,19 @@ recurso(Estudiante,Materia):-
     curso(Estudiante,Materia,_,Anio,OtraModalidad), 
     Modalidad \= OtraModalidad. 
 
-    recurso(Estudiante,Materia):-
-        materia(Materia,_),
-        curso(Estudiante,Materia,_,Anio,Modalidad) ,
-        curso(Estudiante,Materia,_,Anio,OtraModalidad), 
-        Modalidad \= OtraModalidad. 
+recurso(Estudiante,Materia):-
+    materia(Materia,_),
+    curso(Estudiante,Materia,_,Anio,Modalidad) ,
+    curso(Estudiante,Materia,_,Anio,OtraModalidad), 
+    Modalidad \= OtraModalidad. 
+
+
 %Perfiles
 
 sinDescanso(Estudiante):-
     estudiante(Estudiante),
+    curso(Estudiante,Materia,_,Anio,UnaModalidad),
+    curso(Estudiante,Materia,_,UnAnio,OtraModalidad),
  /*    recurso(Estudiante,_), */
     forall(
         (curso(Estudiante,Materia,_,Anio,UnaModalidad),
@@ -241,7 +252,8 @@ repechaje(Estudiante):-
 
 buenasCursadas(Estudiante):-%como la hago inversible
     estudiante(Estudiante),
-    forall(curso(Estudiante,Materia,_,_,_),
+    forall(
+    curso(Estudiante,Materia,_,_,_),
     promociono(Estudiante,Materia)).
 
 veraniego(Estudiante):-
@@ -249,3 +261,50 @@ veraniego(Estudiante):-
     forall(
     curso(Estudiante,_,_,Anio,_),
     curso(Estudiante,_,_,Anio,cursoDeVerano)). 
+
+
+unicoPerfil(Estudiante):-
+    buenasCursadas(Estudiante),
+    not(veraniego(Estudiante)),
+    not(repechaje(Estudiante)),
+    not(invictus(Estudiante)),
+    not(sinDescanso(Estudiante)).
+
+
+unicoPerfil(Estudiante):-
+    veraniego(Estudiante),
+    not(buenasCursadas(Estudiante)),
+    not(repechaje(Estudiante)),
+    not(invictus(Estudiante)),
+    not(sinDescanso(Estudiante)).
+
+%Desempeño academico
+
+/* desempenioAcademico(Estudiante,Desempenio):-
+    desempenioAnual(Estudiante,NotaAnual),
+    desempenioCuatrimestral(Estudiante,NotaCuatri),
+    desmpenioVeraniego(Estudiante,NotaVerano),
+    Desempenio is NotaAnual+NotaCuatri+NotaVerano. */
+
+desempenioAnual(Estudiante,Promedio):-
+    estudiante(Estudiante),
+    findall(Nota,curso(Estudiante,_,Nota,_,anual),Notas),
+    sumlist(Notas, Suma),
+    length(Notas,Largo),
+    Promedio is Suma/Largo.
+
+desempenioCuatrimestral(Estudiante,Promedio):-
+    estudiante(Estudiante),
+    findall(Nota,curso(Estudiante,_,Nota-1,_,primerCuatrimestre),Notas),
+    sumlist(Notas, Suma),
+    length(Notas,Largo),
+    Promedio is Suma/Largo.
+
+
+desempenioCuatrimestral(Estudiante,Promedio):-
+    estudiante(Estudiante),
+    findall(Nota,curso(Estudiante,_,Nota-2,_,segundoCuatrimestre),Notas),
+    sumlist(Notas, Suma),
+    length(Notas,Largo),
+    Promedio is Suma/Largo.
+
