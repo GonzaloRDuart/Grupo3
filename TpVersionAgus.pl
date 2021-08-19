@@ -104,6 +104,8 @@ esPesada(Materia):-
 tieneCorrelativa(Materia):-
     esNecesaria(Materia, _).
 
+/*Saltan multiplicadas */
+
 esInicial(Materia):-
     materia(Materia, _, _),
     not(tieneCorrelativa(Materia)).
@@ -136,6 +138,8 @@ Verificar si haría falta otro nivel. */
 habilitaMaterias(Materia, Habilitadas):-
     esNecesaria(Habilitadas, Materia).
 
+/* agregar que la inversibilidad cubra todas las correlativas como en el punto anterior. TRANSITIVIDAD. */
+
 curso(vero, Materia, 8, modo(anual, 2019)):-
     esInicial(Materia).
 curso(alan, sistemasYOrganizaciones, 6, modo(anual, 2020)).
@@ -164,6 +168,9 @@ cursada(Alumno, Materia):-
     final(Alumno, Materia, Nota),
     Nota >= 6.
 
+/*despues poner nombre mas claro. Es la cursada aprobada, no solo si curso.
+Revisar tambien tema de cursada/finales.  */
+
 aprobada(Alumno, Materia):-
     curso(Alumno, Materia, Nota, _),
     Nota > 7.
@@ -171,7 +178,8 @@ aprobada(Alumno, Materia):-
     final(Alumno, Materia, Nota),
     Nota >= 6.
 
-/* Despues agregar las modalidades de Alan y pulir las de Vero. por el momento puse que curso todas cuatrimestrales el mismo anio*/
+/* Falta terminar de modelar estudiantes. 
+Diferenciar final libre de rendir final? */
 
 anioDeCursada(Alumno, Materia, Anio):-
     curso(Alumno, Materia, _, modo(anual, Anio)).
@@ -184,31 +192,38 @@ anioDeCursada(Alumno, Materia, Anio):-
 /* La consola no maneja bien el caso de quimica. Y tira error luego de indicar el año de SyO. Arreglar */
 
 recurso(Alumno, Materia):-
-    curso(Alumno, Materia, _, X),
-    curso(Alumno, Materia, _, Y),
-    X \= Y.
+    curso(Alumno, Materia, _, Cursada1),
+    curso(Alumno, Materia, _, Cursada2),
+    Cursada1 \= Cursada2.
+
+/* Despues ver si se nos ocurre nombre mas lindo para Cursada1 y 2 */
+
+estudiante(naruto).
+estudiante(vero).
+estudiante(alan).
+estudiante(veraniego).
 
 invictus(Estudiante):-
+    estudiante(Estudiante),
     not(recurso(Estudiante, _)).
-
-/* no es inversible */
 
 promociona(Estudiante, Materia):-
     curso(Estudiante, Materia, Nota, _),
     Nota >= 8.
 
 buenasCursadas(Estudiante):-
+    estudiante(Estudiante),
     forall(curso(Estudiante, Materia, _, _), promociona(Estudiante, Materia)).
-
-/* tampoco es inversible */
 
 repechaje(Estudiante):-
     curso(Estudiante, Materia, Nota1, modo(anual, Anio1)),
     Nota1 < 6,
     curso(Estudiante, Materia, Nota2, modo(cuatrimestral, Anio2, 1)),
-    Nota1 \= Nota2,
     Nota2 >= 8,
     Anio2 is Anio1 + 1.
+
+/*Comparar con otras funciones.
+Podemos crear un predicado para no repetir Anio2 is Anio1 + 1 y que sea mas declarativo */
 
 recursaInmediatamente(Estudiante, Materia):-
     curso(Estudiante, Materia, _, modo(cuatrimestral, Anio, 1)),
@@ -233,6 +248,7 @@ recursaInmediatamente(Estudiante, Materia):-
 /* falta agregar las condiciones de cursada de verano */
 
 sinDescanso(Estudiante):-
+    estudiante(Estudiante),
     forall(recurso(Estudiante, Materia), recursaInmediatamente(Estudiante, Materia)),
     recurso(Estudiante, Materia).
 
