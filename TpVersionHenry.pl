@@ -198,7 +198,5 @@ condicionRepechaje(Alumno,Materia,Anio) :-
     cursada(Alumno,Materia,Nota2,modo(Anio,cuatrimestral(1))),
     Nota2>7.
 
-
-
 buenasCursadas(Alumno) :-
     forall(cursada(Alumno,_,Nota,_),Nota>7).
