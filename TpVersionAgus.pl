@@ -153,10 +153,22 @@ curso(naruto, quimica, 6, modo(cuatrimestral, 2020, 2)).
 curso(naruto, fisica1, 8, modo(anual, 2019)).
 curso(naruto, matematicaDiscreta, 5, modo(anual, 2019)).
 curso(naruto, matematicaDiscreta, 8, modo(cuatrimestral, 2020, 1)).
-curso(veraniego, matematicaDiscreta, 5, modo(anual, 2017)).
+curso(veraniego, quimica, 6, modo(anual, 2016)).
+curso(veraniego, fisica1, 6, modo(verano, 2017)).
+curso(veraniego, matematicaDiscreta, 2, modo(anual, 2017)).
 curso(veraniego, matematicaDiscreta, 8, modo(verano, 2018)).
-curso(veraniego, analisisDeSistemas, 8, modo(verano, 2019)).
-curso(veraniego, sistemasYOrganizaciones, 8, modo(verano, 2020)).
+curso(muchasRecursadas, quimica, 2, modo(anual, 2016)).
+curso(muchasRecursadas, quimica, 3, modo(cuatrimestral, 2017, 1)).
+curso(muchasRecursadas, quimica, 4, modo(cuatrimestral, 2017, 2)).
+curso(muchasRecursadas, quimica, 5, modo(anual, 2018)).
+curso(muchasRecursadas, fisica1, 2, modo(verano, 2018)).
+curso(muchasRecursadas, fisica1, 2, modo(anual, 2018)).
+curso(algunasRecursadas, quimica, 2, modo(anual, 2016)).
+curso(algunasRecursadas, quimica, 3, modo(cuatrimestral, 2017, 2)).
+curso(algunasRecursadas, fisica1, 2, modo(anual, 2017)).
+curso(algunasRecursadas, fisica1, 10, modo(cuatrimestral, 2018, 1)).
+curso(atr, quimica, 10, modo(cuatrimestral, 2016, 1)).
+curso(atr, fisica1, 10, modo(cuatrimestral, 2016, 2)).
 final(alan, sistemasYOrganizaciones, 4).
 final(alan, ingles1, 2).
 final(vero, ingles2, 10).
@@ -202,6 +214,9 @@ estudiante(naruto).
 estudiante(vero).
 estudiante(alan).
 estudiante(veraniego).
+estudiante(muchasRecursadas).
+estudiante(atr).
+estudiante(algunasRecursadas).
 
 invictus(Estudiante):-
     estudiante(Estudiante),
@@ -302,36 +317,28 @@ unicoPerfil(Estudiante):-
     not(buenasCursadas(Estudiante)),
     seLoQueHicisteElVeranoPasado(Estudiante).
 
-esPar(Numero):-
-    mod(Numero, 2) is 0.
+esPar(N):- 
+    mod(N,2) =:= 0.
 
-valorDesempenio(_, modo(verano, Anio), 5):-
+indice(Alumno, Materia, Nota):-
+    curso(Alumno, Materia, Nota, modo(anual, _)).
+
+indice(Alumno, Materia, Nota1):-
+    curso(Alumno, Materia, Nota2, modo(cuatrimestral, _, Cuatrimestre)),
+    Nota1 is Nota2 - Cuatrimestre.
+
+indice(Alumno, Materia, 5):-
+    curso(Alumno, Materia, _, modo(verano, Anio)),
     esPar(Anio).
-valorDesempenio(Nota, modo(verano, Anio), Desempenio):-
+
+indice(Alumno, Materia, Nota1):-
+    curso(Alumno , Materia, Nota2, modo(verano, Anio)),
     not(esPar(Anio)),
-    Desempenio is Nota / 2.
-valorDesempenio(Nota, modo(anual, _), Desempenio):-
-    Desempenio is Nota.
-valorDesempenio(Nota, modo(cuatrimestral, _, Numero), Desempenio):-
-    Desempenio is Nota - Numero.
+    Nota1 is Nota2 // 2.
 
-listaNotas(Estudiante, Notas, CantidadNotas):-
-    findall(Nota, curso(Estudiante, _, Nota, _), Notas),
-    length(Notas, CantidadNotas).
-
-listaModos(Estudiante, Modos, CantidadModos):-
-    findall(Modo, curso(Estudiante, _, _, Modo), Modos),
-    length(Modos, CantidadModos).
-
-indiceDesempenio(Estudiante, Notas, Modos, Indice, ResultadoDesempenio):-
-    nth1(Modos, Indice, Modo),
-    nth1(Notas, Indice, Nota),
-    valorDesempenio(Nota, Modo, ResultadoDesempenio).
-
-/*
-listaDesempenios(Estudiante):-
-    listaNotas(Estudiante, Notas, CantidadNotas),
-    listaModos(Estudiante, Modos, CantidadModos),
-    findall()
-    Como seguir?
-*/
+desempenioAcademico(Alumno, Promedio):-
+    estudiante(Alumno),
+    findall(Nota, indice(Alumno, _, Nota), Notas),
+    length(Notas, Cantidad),
+    sum_list(Notas, Total),
+    Promedio is Total // Cantidad.
