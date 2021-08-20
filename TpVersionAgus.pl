@@ -271,3 +271,33 @@ seLoQueHicisteElVeranoPasado(Estudiante):-
     ultimoAnioDeCursada(Estudiante, UltimoAnio),
     forall(between(PrimerAnio, UltimoAnio, Anio), cursaEseVerano(Estudiante, Anio)).
 
+unicoPerfil(Estudiante):-
+    sinDescanso(Estudiante),
+    not(invictus(Estudiante)),
+    not(repechaje(Estudiante)),
+    not(buenasCursadas(Estudiante)),
+    not(seLoQueHicisteElVeranoPasado(Estudiante)).
+unicoPerfil(Estudiante):-
+    not(sinDescanso(Estudiante)),
+    invictus(Estudiante),
+    not(repechaje(Estudiante)),
+    not(buenasCursadas(Estudiante)),
+    not(seLoQueHicisteElVeranoPasado(Estudiante)).
+unicoPerfil(Estudiante):-
+    not(sinDescanso(Estudiante)),
+    not(invictus(Estudiante)),
+    repechaje(Estudiante),
+    not(buenasCursadas(Estudiante)),
+    not(seLoQueHicisteElVeranoPasado(Estudiante)).
+unicoPerfil(Estudiante):-
+    not(sinDescanso(Estudiante)),
+    not(invictus(Estudiante)),
+    not(repechaje(Estudiante)),
+    buenasCursadas(Estudiante),
+    not(seLoQueHicisteElVeranoPasado(Estudiante)).
+unicoPerfil(Estudiante):-
+    not(sinDescanso(Estudiante)),
+    not(invictus(Estudiante)),
+    not(repechaje(Estudiante)),
+    not(buenasCursadas(Estudiante)),
+    seLoQueHicisteElVeranoPasado(Estudiante).
