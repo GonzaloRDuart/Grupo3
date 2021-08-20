@@ -63,7 +63,7 @@ correlativa(legislacion,analisis_de_Sistemas).
 correlativa(legislacion,ingenieria_y_Sociedad).
 correlativa(administracion_de_Recursos,disenio_de_Sistemas).
 correlativa(administracion_de_Recursos,sistemas_Operativos).
-Correlativa(administracion_de_Recursos,economia).
+correlativa(administracion_de_Recursos,economia).
 correlativa(ingenieria_de_Software,probabilidad_y_Estadistica).
 correlativa(ingenieria_de_Software,disenio_de_Sistemas).
 correlativa(ingenieria_de_Software,gestion_de_Datos).
@@ -107,26 +107,96 @@ materiaPesada(Materia) :- materia(Materia,Horas),not(integradora(Materia)),Horas
 
 %Punto 2, Correlativas
 materiaInicial(Materia) :- materia(Materia,_),not(correlativa(Materia,_)).
-materiasNecesariasParaCursar(Materia,MateriasRequeridas) :- materia(Materia,_),correlativa(Materia,MateriasRequeridas).
-
+materiaNecesariaParaCursar(Materia,MateriaReq) :- 
+    materia(Materia,_),correlativa(Materia,MateriaReq).
+materiaNecesariaParaCursar(Materia,Correlativa) :- 
+    materia(Materia,_),
+    correlativa(Materia,MateriaRequerida),
+    materiaNecesariaParaCursar(MateriaRequerida,Correlativa).
 materiaQueHabilita(Materia,Correlativa) :- correlativa(Correlativa,Materia).
 
 %Punto 3, los estudiantes, materias cursadas y aprobadas
-notaCursada(vero,Materia,Nota) :- materiaInicial(Materia),Nota is 8.
-notaCursada(alan,sistemas_y_Organizaciones,6).
-notaCursada(alan,analisis_Matematico_I,6).
-notaCursada(alan,analisis_de_Sistemas,2).
-notaCursada(alan,analisis_de_Sistemas,9).
-notaCursada(alan,fisica_I,2).
-notaFinal(vero,ingles_II,10).
-notaFinal(alan,sistemas_y_Organizaciones,4).
-notaFinal(alan,ingles_I,2).
+%cursada(Alumno,Materia,Nota,modo(año,modalidad))
+cursada(vero,Materia,Nota,modo(2020,anual)) :- materiaInicial(Materia),Nota is 8.
+cursada(alan,sistemas_y_Organizaciones,6,modo(2019,anual)).
+cursada(alan,analisis_Matematico_I,6,modo(2019,anual)).
+cursada(alan,analisis_de_Sistemas,2,modo(2020,anual)).
+cursada(alan,analisis_de_Sistemas,9,modo(2021,verano)).
+cursada(alan,fisica_I,2,modo(2020,anual)).
+
+cursada(juan,sistemas_y_Organizaciones,6,modo(2015,anual)).
+cursada(juan,quimica,4,modo(2015,cuatrimestral(1))).
+cursada(juan,quimica,8,modo(2015,cuatrimestral(2))).
+cursada(juan,fisica_I,7,modo(2016,verano)).
+
+cursada(pepe,quimica,2,modo(2016,anual)).
+cursada(pepe,quimica,3,modo(2017,cuatrimestral(1))).
+cursada(pepe,quimica,4,modo(2017,cuatrimestal(2))).
+cursada(pepe,quimica,5,modo(2018,anual)).
+cursada(pepe,fisica_I,2,modo(2018,verano)).
+cursada(pepe,fisica_I,2,modo(2018,anual)).
+
+cursada(gaby,quimica,2,modo(2016,anual)).
+cursada(gaby,quimica,3,modo(2017,cuatrimestral(2))).
+cursada(gaby,fisica_I,2,modo(2017,anual)).
+cursada(gaby,fisica_I,10,modo(2018,cuatrimestral(1))).
+
+cursada(veraniego,quimica,6,modo(2016,anual)).
+cursada(veraniego,fisica_I,6,modo(2017,verano)).
+cursada(veraniego,matematica_Discreta,2,modo(2017,anual)).
+cursada(veraniego,matematica_Discreta,8,modo(2018,verano)).
+
+cursada(estudianteATR,quimica,10,modo(2016,cuatrimestral(1))).
+cursada(estudianteATR,fisica_I,10,modo(2016,cuatrimestal(2))).
+
+final(vero,ingles_II,10).
+final(alan,sistemas_y_Organizaciones,4).
+final(alan,ingles_I,2).
 
 materiaCursada(Alumno,Materia) :- materiaAprobada(Alumno,Materia). %Para que considere cursadas aprobadas
-materiaCursada(Alumno,Materia) :- notaCursada(Alumno,Materia,Nota),Nota>5.
-materiaAprobada(Alumno,Materia) :- notaFinal(Alumno,Materia,Nota),Nota>5. 
-materiaAprobada(Alumno,Materia) :- notaCursada(Alumno,Materia,Nota), Nota>7. %Promocion
-materiaAprobada(Alumno,Materia) :- notaFinal(Alumno,Materia,Nota),libre(Materia),Nota>5. %Aprobado por libre
+materiaCursada(Alumno,Materia) :- cursada(Alumno,Materia,Nota,_),Nota>5.
+materiaAprobada(Alumno,Materia) :- final(Alumno,Materia,Nota),Nota>5. 
+materiaAprobada(Alumno,Materia) :- cursada(Alumno,Materia,Nota,_), Nota>7. %Promocion
+materiaAprobada(Alumno,Materia) :- final(Alumno,Materia,Nota),libre(Materia),Nota>5. %Aprobado por libre
 
-%Punto 4, modalidades (1.Primer cuatri,2.Segundo cuatri, 3.Verano)
-%cursada(Alumno,Materia,Nota,fecha(año,modalidad))
+%Punto 4 y 5, modalidades (1.Primer cuatri,2.Segundo cuatri, 3.Verano)
+
+alumno(vero).
+alumno(alan).
+alumno(juan).
+alumno(pepe).
+anioCursada(Alumno,Materia,Anio) :- 
+    alumno(Alumno),
+    cursada(Alumno,Materia,_,modo(Anio,Modo)),Modo\=verano.
+
+anioCursada(Alumno,Materia,Anio) :-
+    alumno(Alumno),
+    cursada(Alumno,Materia,_,modo(Aniocursada,Modo)),
+    Modo=verano,Anio is Aniocursada-1.
+
+recursoMateria(Alumno,Materia) :-
+    alumno(Alumno),
+    cursada(Alumno,Materia,_,Modalidad),
+    cursada(Alumno,Materia,_,OtraModalidad),
+    Modalidad\=OtraModalidad.
+
+%Punto 6, perfiles de estudiantes
+
+%sinDescanso
+
+invictus(Alumno) :- not(recursoMateria(Alumno,_)).
+
+repechaje(Alumno) :- alumno(Alumno),
+repruebaAnual(Alumno,Materia,Anio),
+condicionRepechaje(Alumno,Materia,AnioSiguiente),
+AnioSiguiente is Anio+1.
+
+repruebaAnual(Alumno,Materia,Anio) :-
+    cursada(Alumno,Materia,Nota1,modo(Anio,anual)),Nota1<6.
+
+condicionRepechaje(Alumno,Materia,Anio) :-
+    cursada(Alumno,Materia,Nota2,modo(Anio,cuatrimestral(1))),
+    Nota2>7.
+
+buenasCursadas(Alumno) :-
+    forall(cursada(Alumno,_,Nota,_),Nota>7).
