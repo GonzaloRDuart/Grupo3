@@ -135,8 +135,6 @@ listaHabilitadas(Materia, Habilitadas):-
     findall(Habilitada, habilitaMaterias(Materia, Habilitada), Habilitadas1),
     list_to_set(Habilitadas1, Habilitadas).
 
-/* agregar que la inversibilidad cubra todas las correlativas como en el punto anterior. TRANSITIVIDAD. */
-
 curso(vero, Materia, 8, modo(anual, 2019)):-
     esInicial(Materia).
 curso(alan, sistemasYOrganizaciones, 6, modo(anual, 2020)).
@@ -170,25 +168,19 @@ final(alan, sistemasYOrganizaciones, 4).
 final(alan, ingles1, 2).
 final(vero, ingles2, 10).
 
-cursada(Alumno, Materia):-
+cursadaAprobada(Alumno, Materia):-
     curso(Alumno, Materia, Nota, _),
     Nota >= 6.
-cursada(Alumno, Materia):-
+cursadaAprobada(Alumno, Materia):-
     final(Alumno, Materia, Nota),
     Nota >= 6.
 
-/*despues poner nombre mas claro. Es la cursada aprobada, no solo si curso.
-Revisar tambien tema de cursada/finales.  */
-
-aprobada(Alumno, Materia):-
+materiaAprobada(Alumno, Materia):-
     curso(Alumno, Materia, Nota, _),
     Nota > 7.
-aprobada(Alumno, Materia):-
+materiaAprobada(Alumno, Materia):-
     final(Alumno, Materia, Nota),
     Nota >= 6.
-
-/* Falta terminar de modelar estudiantes. 
-Diferenciar final libre de rendir final? */
 
 anioDeCursada(Alumno, Materia, Anio):-
     curso(Alumno, Materia, _, modo(anual, Anio)).
@@ -198,14 +190,18 @@ anioDeCursada(Alumno, Materia, Anio):-
     curso(Alumno, Materia, _, modo(verano, AnioCalendario)),
     Anio is AnioCalendario - 1.
 
-/* La consola no maneja bien el caso de quimica. Y tira error luego de indicar el año de SyO. Arreglar */
+listaAniosDeCursada(Alumno, Materia, Anios):-
+    findall(Anio, anioDeCursada(Alumno, Materia, Anio), Anios2),
+    list_to_ord_set(Anios2, Anios).
 
 recurso(Alumno, Materia):-
     curso(Alumno, Materia, _, Cursada1),
     curso(Alumno, Materia, _, Cursada2),
     Cursada1 \= Cursada2.
 
-/* Despues ver si se nos ocurre nombre mas lindo para Cursada1 y 2 */
+listaRecursadas(Alumno, Materias):-
+    findall(Materia, recurso(Alumno, Materia), Materias1),
+    list_to_set(Materias1, Materias).
 
 estudiante(naruto).
 estudiante(vero).
@@ -256,6 +252,15 @@ recursaInmediatamente(Estudiante, Materia):-
     curso(Estudiante, Materia, _, modo(anual, Anio1)),
     curso(Estudiante, Materia, _, modo(cuatrimestral, Anio2, 1)),
     Anio2 is Anio1 + 1.
+recursaInmediatamente(Estudiante, Materia):-
+    curso(Estudiante, Materia, _, modo(verano, Anio1)),
+    curso(Estudiante, Materia, _, modo(anual, Anio2)),
+    Anio2 is Anio1.
+recursaInmediatamente(Estudiante, Materia):-
+    curso(Estudiante, Materia, _, modo(anual, Anio1)),
+    curso(Estudiante, Materia, _, modo(cuatrimestral, Anio2, 1)),
+    Anio2 is Anio1.
+
 
 /* falta agregar las condiciones de cursada de verano */
 
@@ -264,7 +269,9 @@ sinDescanso(Estudiante):-
     forall(recurso(Estudiante, Materia), recursaInmediatamente(Estudiante, Materia)),
     recurso(Estudiante, Materia).
 
-/* al tratar de aplicarla de forma inversible devuelve los alumnos correctamente pero en muchas repeticiones*/
+listaEstudiantesSinDescanso(Estudiantes):-
+    findall(Estudiante, sinDescanso(Estudiante), Estudiantes1),
+    list_to_set(Estudiantes1, Estudiantes).
 
 primerAnioDeCursada(Estudiante, PrimerAnio):-
     anioDeCursada(Estudiante, _, PrimerAnio),
@@ -283,6 +290,11 @@ seLoQueHicisteElVeranoPasado(Estudiante):-
     ultimoAnioDeCursada(Estudiante, UltimoAnio),
     forall(between(PrimerAnio, UltimoAnio, Anio), cursaEseVerano(Estudiante, Anio)).
 
+listaSeLoQueHicisteElVeranoPasado(Estudiantes):-
+    findall(Estudiante, seLoQueHicisteElVeranoPasado(Estudiante), Estudiantes1),
+    list_to_set(Estudiantes1, Estudiantes).
+
+/* 
 unicoPerfil(Estudiante):-
     sinDescanso(Estudiante),
     not(invictus(Estudiante)),
@@ -313,6 +325,26 @@ unicoPerfil(Estudiante):-
     not(repechaje(Estudiante)),
     not(buenasCursadas(Estudiante)),
     seLoQueHicisteElVeranoPasado(Estudiante).
+
+*/
+
+tienePerfil(Alumno, sinDescanso):-
+    sinDescanso(Alumno).
+tienePerfil(Alumno, seLoQueHicisteElVeranoPasado):-
+    seLoQueHicisteElVeranoPasado(Alumno).
+tienePerfil(Alumno, repechaje):-
+    repechaje(Alumno).
+tienePerfil(Alumno, buenasCursadas):-
+    buenasCursadas(Alumno).
+tienePerfil(Alumno, invictus):-
+    invictus(Alumno).
+
+perfilUnico(Alumno):-
+    estudiante(Alumno),
+    findall(Perfil, tienePerfil(Alumno, Perfil), Conjunto1),
+    list_to_set(Conjunto1, Conjunto2),
+    length(Conjunto2, Cantidad),
+    Cantidad =:= 1.
 
 esPar(N):- 
     mod(N,2) =:= 0.
