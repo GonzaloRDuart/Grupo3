@@ -301,3 +301,37 @@ unicoPerfil(Estudiante):-
     not(repechaje(Estudiante)),
     not(buenasCursadas(Estudiante)),
     seLoQueHicisteElVeranoPasado(Estudiante).
+
+esPar(Numero):-
+    mod(Numero, 2) is 0.
+
+valorDesempenio(_, modo(verano, Anio), 5):-
+    esPar(Anio).
+valorDesempenio(Nota, modo(verano, Anio), Desempenio):-
+    not(esPar(Anio)),
+    Desempenio is Nota / 2.
+valorDesempenio(Nota, modo(anual, _), Desempenio):-
+    Desempenio is Nota.
+valorDesempenio(Nota, modo(cuatrimestral, _, Numero), Desempenio):-
+    Desempenio is Nota - Numero.
+
+listaNotas(Estudiante, Notas, CantidadNotas):-
+    findall(Nota, curso(Estudiante, _, Nota, _), Notas),
+    length(Notas, CantidadNotas).
+
+listaModos(Estudiante, Modos, CantidadModos):-
+    findall(Modo, curso(Estudiante, _, _, Modo), Modos),
+    length(Modos, CantidadModos).
+
+indiceDesempenio(Estudiante, Notas, Modos, Indice, ResultadoDesempenio):-
+    nth1(Modos, Indice, Modo),
+    nth1(Notas, Indice, Nota),
+    valorDesempenio(Nota, Modo, ResultadoDesempenio).
+
+/*
+listaDesempenios(Estudiante):-
+    listaNotas(Estudiante, Notas, CantidadNotas),
+    listaModos(Estudiante, Modos, CantidadModos),
+    findall()
+    Como seguir?
+*/
