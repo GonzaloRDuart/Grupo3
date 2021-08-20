@@ -88,6 +88,9 @@ esNecesaria(proyectoFinal, administracionDeRecursos).
 esNecesaria(proyectoFinal, redesDeInformacion).
 esNecesaria(proyectoFinal, ingenieriaDeSoftware).
 
+habilitaA(Materia, PosMateria):-
+    esNecesaria(PosMateria, Materia).
+
 esIntegradora(Materia):-
     materia(Materia, _, si).
 
@@ -104,7 +107,9 @@ esPesada(Materia):-
 tieneCorrelativa(Materia):-
     esNecesaria(Materia, _).
 
-/*Saltan multiplicadas */
+listaMateriasConCorrelativas(Materias):-
+    findall(Materia, tieneCorrelativa(Materia), Materias1),
+    list_to_set(Materias1, Materias).
 
 esInicial(Materia):-
     materia(Materia, _, _),
@@ -116,27 +121,19 @@ tambienNecesito(Materia, SubMateria):-
     esNecesaria(Materia, X),
     tambienNecesito(X, SubMateria).
 
-/* Definicion recursiva, funciona pero puede devolver varias veces lo mismo si hay 2 materias necesarias que a su vez comparten materias necesarias.
-Considerar utilizar multiples niveles de tambienNecesito en vez de recursividad.
-Ej:
-tambienNecesito(Materia, Submateria):-
-    esNecesaria(Materia, Submateria).
-tambienNecesito(Materia, Submateria):-
-    esNecesaria(Materia, X),
-    esNecesatia(X, Submateria).
-tambienNecesito(Materia, Submateria):-
-    esNecesaria(Materia, X1),
-    esNecesaria(X1, X2),
-    esNecesaria(X2, Submateria).
-tambienNecesito(Materia, Submateria):-
-    esNecesaria(Materia, X1),
-    esNecesaria(X1, X2),
-    esNecesaria(X2, X3),
-    esNecesaria(X3, Submateria).
-Verificar si haría falta otro nivel. */
+listaNecesarias(Materia, SubMaterias):-
+    findall(SubMateria, tambienNecesito(Materia, SubMateria), SubMaterias1),
+    list_to_set(SubMaterias1, SubMaterias).
 
-habilitaMaterias(Materia, Habilitadas):-
-    esNecesaria(Habilitadas, Materia).
+habilitaMaterias(Materia, Posterior):-
+    habilitaA(Materia, Posterior).
+habilitaMaterias(Materia, Posterior):-
+    habilitaA(Materia, X),
+    habilitaMaterias(X, Posterior).
+
+listaHabilitadas(Materia, Habilitadas):-
+    findall(Habilitada, habilitaMaterias(Materia, Habilitada), Habilitadas1),
+    list_to_set(Habilitadas1, Habilitadas).
 
 /* agregar que la inversibilidad cubra todas las correlativas como en el punto anterior. TRANSITIVIDAD. */
 
