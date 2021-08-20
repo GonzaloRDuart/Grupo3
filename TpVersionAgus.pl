@@ -255,14 +255,11 @@ recursaInmediatamente(Estudiante, Materia):-
 recursaInmediatamente(Estudiante, Materia):-
     curso(Estudiante, Materia, _, modo(verano, Anio1)),
     curso(Estudiante, Materia, _, modo(anual, Anio2)),
-    Anio2 is Anio1.
+    Anio2 = Anio1.
 recursaInmediatamente(Estudiante, Materia):-
     curso(Estudiante, Materia, _, modo(anual, Anio1)),
     curso(Estudiante, Materia, _, modo(cuatrimestral, Anio2, 1)),
-    Anio2 is Anio1.
-
-
-/* falta agregar las condiciones de cursada de verano */
+    Anio2 = Anio1.
 
 sinDescanso(Estudiante):-
     estudiante(Estudiante),
@@ -293,40 +290,6 @@ seLoQueHicisteElVeranoPasado(Estudiante):-
 listaSeLoQueHicisteElVeranoPasado(Estudiantes):-
     findall(Estudiante, seLoQueHicisteElVeranoPasado(Estudiante), Estudiantes1),
     list_to_set(Estudiantes1, Estudiantes).
-
-/* 
-unicoPerfil(Estudiante):-
-    sinDescanso(Estudiante),
-    not(invictus(Estudiante)),
-    not(repechaje(Estudiante)),
-    not(buenasCursadas(Estudiante)),
-    not(seLoQueHicisteElVeranoPasado(Estudiante)).
-unicoPerfil(Estudiante):-
-    not(sinDescanso(Estudiante)),
-    invictus(Estudiante),
-    not(repechaje(Estudiante)),
-    not(buenasCursadas(Estudiante)),
-    not(seLoQueHicisteElVeranoPasado(Estudiante)).
-unicoPerfil(Estudiante):-
-    not(sinDescanso(Estudiante)),
-    not(invictus(Estudiante)),
-    repechaje(Estudiante),
-    not(buenasCursadas(Estudiante)),
-    not(seLoQueHicisteElVeranoPasado(Estudiante)).
-unicoPerfil(Estudiante):-
-    not(sinDescanso(Estudiante)),
-    not(invictus(Estudiante)),
-    not(repechaje(Estudiante)),
-    buenasCursadas(Estudiante),
-    not(seLoQueHicisteElVeranoPasado(Estudiante)).
-unicoPerfil(Estudiante):-
-    not(sinDescanso(Estudiante)),
-    not(invictus(Estudiante)),
-    not(repechaje(Estudiante)),
-    not(buenasCursadas(Estudiante)),
-    seLoQueHicisteElVeranoPasado(Estudiante).
-
-*/
 
 tienePerfil(Alumno, sinDescanso):-
     sinDescanso(Alumno).
