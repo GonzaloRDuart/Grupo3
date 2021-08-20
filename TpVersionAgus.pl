@@ -1,3 +1,11 @@
+/* IMPORTANTE:
+Este programa contiene consultas que generan listas, las cuales pueden llegar a ser extensas. 
+Antes de generar cualquier consulta, recomendamos fuertemente ingresar en consola el siguiente comando:
+
+set_prolog_flag(answer_write_options,[max_depth(0)]).
+
+Esto permite que la consola muestre las listas completas en vez de, por defecto, respetar un limite de elementos.  */
+
 materia(analisisMatematico1, 5, no).
 materia(algebraYGeometriaAnalitica, 5, no).
 materia(matematicaDiscreta, 3, no).
@@ -33,6 +41,7 @@ materia(proyectoFinal, 6, si).
 materia(inteligenciaArtificial, 3, no).
 materia(administracionGerencial, 3, no).
 materia(sistemasDeGestion, 4, no).
+/* El primer parametro corresponde al nombre de la materia. El segundo parametro a la cantidad de horas semanales de cursada. El tercero a si es integradora o no */
 
 esNecesaria(analisisDeSistemas, sistemasYOrganizaciones).
 esNecesaria(analisisDeSistemas, algoritmosYEstructurasDeDatos).
@@ -87,9 +96,11 @@ esNecesaria(proyectoFinal, legislacion).
 esNecesaria(proyectoFinal, administracionDeRecursos).
 esNecesaria(proyectoFinal, redesDeInformacion).
 esNecesaria(proyectoFinal, ingenieriaDeSoftware).
+/* Indica que para cursar la materia pasada como primer parametro, antes es necesario cursar la materia pasada como segundo parametro */
 
 habilitaA(Materia, PosMateria):-
     esNecesaria(PosMateria, Materia).
+/* Toma como parametros 2 materias e indica si la segunda materia es necesaria para cursar la primer materia */
 
 esIntegradora(Materia):-
     materia(Materia, _, si).
@@ -98,7 +109,6 @@ esPesada(Materia):-
     materia(Materia, Duracion, _),
     Duracion = 6,
     esIntegradora(Materia).
-
 esPesada(Materia):-
     materia(Materia, Duracion, _),
     Duracion >= 4,
@@ -110,6 +120,7 @@ tieneCorrelativa(Materia):-
 listaMateriasConCorrelativas(Materias):-
     findall(Materia, tieneCorrelativa(Materia), Materias1),
     list_to_set(Materias1, Materias).
+/* Su parametro corresponde a la lista de todas las materias con correlativas */
 
 esInicial(Materia):-
     materia(Materia, _, _),
@@ -120,20 +131,24 @@ tambienNecesito(Materia, SubMateria):-
 tambienNecesito(Materia, SubMateria):-
     esNecesaria(Materia, X),
     tambienNecesito(X, SubMateria).
+/*Toma como parametro 2 materias e indica si para cursar la primera necesito la segunda, ya sea directa o indirectamente */
 
 listaNecesarias(Materia, SubMaterias):-
     findall(SubMateria, tambienNecesito(Materia, SubMateria), SubMaterias1),
     list_to_set(SubMaterias1, SubMaterias).
+/* Indica si el segundo parametro es la lista de materias necesarias, tanto directa como indirectamente, para cursar la materia pasada en el primer parametro.*/
 
 habilitaMaterias(Materia, Posterior):-
     habilitaA(Materia, Posterior).
 habilitaMaterias(Materia, Posterior):-
     habilitaA(Materia, X),
     habilitaMaterias(X, Posterior).
+/* Toma como parametro 2 materias, e indica si cursar la primer materia es condicion para cursar la segunda */
 
 listaHabilitadas(Materia, Habilitadas):-
     findall(Habilitada, habilitaMaterias(Materia, Habilitada), Habilitadas1),
     list_to_set(Habilitadas1, Habilitadas).
+/* Indica si el segundo parametro es la lista de materias que habilita, tanto directa como indirectamente, cursar la materia pasada en el primer parametro.*/
 
 curso(vero, Materia, 8, modo(anual, 2019)):-
     esInicial(Materia).
@@ -189,10 +204,13 @@ anioDeCursada(Alumno, Materia, Anio):-
 anioDeCursada(Alumno, Materia, Anio):-
     curso(Alumno, Materia, _, modo(verano, AnioCalendario)),
     Anio is AnioCalendario - 1.
+/* Determina si el alumno mencionado en el primer parametro curso la materia pasada como segundo parametro en el año pasado como tercer parametro */
 
 listaAniosDeCursada(Alumno, Materia, Anios):-
     findall(Anio, anioDeCursada(Alumno, Materia, Anio), Anios2),
     list_to_ord_set(Anios2, Anios).
+/* Verifica que el tercer parametro corresponda a una lista de todos los años en los cuales el alumno del primer parametro curso la materia pasada como segundo parametro. 
+Especialmente util para recursantes */
 
 recurso(Alumno, Materia):-
     curso(Alumno, Materia, _, Cursada1),
@@ -202,6 +220,8 @@ recurso(Alumno, Materia):-
 listaRecursadas(Alumno, Materias):-
     findall(Materia, recurso(Alumno, Materia), Materias1),
     list_to_set(Materias1, Materias).
+/* Verifica si el segundo parametro corresponde a la lista de todas las materias que recurso el alumno pasado como primer parametro.
+Utilizar si se conoce el alumno. */
 
 estudiante(naruto).
 estudiante(vero).
@@ -230,9 +250,8 @@ repechaje(Estudiante):-
     Nota2 >= 8,
     Anio2 is Anio1 + 1.
 
-/*Comparar con otras funciones.
-Podemos crear un predicado para no repetir Anio2 is Anio1 + 1 y que sea mas declarativo */
 
+/* A continuación, funcion auxiliar que determina los casos en los cuales se considera que un alumno (1er parametro) recurso de inmediato una materia (2do parametro) */
 recursaInmediatamente(Estudiante, Materia):-
     curso(Estudiante, Materia, _, modo(cuatrimestral, Anio, 1)),
     curso(Estudiante, Materia, _, modo(cuatrimestral, Anio, 2)).
@@ -260,6 +279,7 @@ recursaInmediatamente(Estudiante, Materia):-
     curso(Estudiante, Materia, _, modo(anual, Anio1)),
     curso(Estudiante, Materia, _, modo(cuatrimestral, Anio2, 1)),
     Anio2 = Anio1.
+/* ----------------------------------------------------------------------------------------------------------------------------------------------------- */
 
 sinDescanso(Estudiante):-
     estudiante(Estudiante),
@@ -269,7 +289,9 @@ sinDescanso(Estudiante):-
 listaEstudiantesSinDescanso(Estudiantes):-
     findall(Estudiante, sinDescanso(Estudiante), Estudiantes1),
     list_to_set(Estudiantes1, Estudiantes).
+/*Su unico parametro es la lista de estudiantes que cumplen con el perfil de Sin Descanso */
 
+/* A continuación, funciones auxiliares para seLoQueHicisteElVeranoPasado */
 primerAnioDeCursada(Estudiante, PrimerAnio):-
     anioDeCursada(Estudiante, _, PrimerAnio),
     forall(anioDeCursada(Estudiante, _, Anio), PrimerAnio =< Anio).
@@ -281,6 +303,7 @@ ultimoAnioDeCursada(Estudiante, UltimoAnio):-
 cursaEseVerano(Estudiante, Anio):-
     curso(Estudiante, _, _, modo(verano, AnioCalendario)),
     Anio is AnioCalendario - 1.
+/* --------------------------------------------------------------------- */
 
 seLoQueHicisteElVeranoPasado(Estudiante):-
     primerAnioDeCursada(Estudiante, PrimerAnio),
@@ -291,6 +314,10 @@ listaSeLoQueHicisteElVeranoPasado(Estudiantes):-
     findall(Estudiante, seLoQueHicisteElVeranoPasado(Estudiante), Estudiantes1),
     list_to_set(Estudiantes1, Estudiantes).
 
+/* Su unico parametro es la lista de estudiantes que cumple con el perfil se lo que hiciste el verano pasado */
+
+
+/* Funcion Auxiliar que determina si un alumno tiene un perfil */
 tienePerfil(Alumno, sinDescanso):-
     sinDescanso(Alumno).
 tienePerfil(Alumno, seLoQueHicisteElVeranoPasado):-
@@ -301,6 +328,7 @@ tienePerfil(Alumno, buenasCursadas):-
     buenasCursadas(Alumno).
 tienePerfil(Alumno, invictus):-
     invictus(Alumno).
+/* ---------------------------------------------------------  */
 
 perfilUnico(Alumno):-
     estudiante(Alumno),
@@ -309,24 +337,24 @@ perfilUnico(Alumno):-
     length(Conjunto2, Cantidad),
     Cantidad =:= 1.
 
+
+/* Funciones Auxiliares para determinar el desempeño academico de un estudiante */
 esPar(N):- 
     mod(N,2) =:= 0.
 
 indice(Alumno, Materia, Nota):-
     curso(Alumno, Materia, Nota, modo(anual, _)).
-
 indice(Alumno, Materia, Nota1):-
     curso(Alumno, Materia, Nota2, modo(cuatrimestral, _, Cuatrimestre)),
     Nota1 is Nota2 - Cuatrimestre.
-
 indice(Alumno, Materia, 5):-
     curso(Alumno, Materia, _, modo(verano, Anio)),
     esPar(Anio).
-
 indice(Alumno, Materia, Nota1):-
     curso(Alumno , Materia, Nota2, modo(verano, Anio)),
     not(esPar(Anio)),
     Nota1 is Nota2 // 2.
+/* ----------------------------------------------------------------------------- */
 
 desempenioAcademico(Alumno, Promedio):-
     estudiante(Alumno),
